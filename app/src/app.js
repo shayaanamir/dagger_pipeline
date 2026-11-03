@@ -1,4 +1,5 @@
-﻿const express = require("express");
+//app.js for router
+const express = require("express");
 const path = require("path");
 const notesRouter = require("./routes/notes");
 
