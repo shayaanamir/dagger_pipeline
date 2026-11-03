@@ -78,4 +78,4 @@ cd app; npm install; npm test; npm start
 | 3 | App code changed | ~11 s | cached |
 | 4 | Dependency added | ~20 s | ran |
 
-See [DEMO.md](DEMO.md) for the full demonstration script.
+
