@@ -1,0 +1,31 @@
+name: Dagger CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    env:
+      DAGGER_VERSION: 1.0.0-beta.23
+      DAGGER_NO_NAG: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Dagger CLI
+        run: curl -fsSL https://dl.dagger.io/dagger/install.sh | BIN_DIR=/usr/local/bin sh
+
+      # The exact same pipeline that runs on the laptop
+      - name: Run pipeline (deps -> test -> build -> image)
+        run: dagger api call ci ci
+
+      - name: Export container image
+        run: dagger api call ci tarball --output=notes-image.tar
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: notes-image
+          path: notes-image.tar

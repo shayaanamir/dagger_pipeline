@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dagger Notes</title>
+  <style>
+    :root { --bg: #f5f6fa; --card: #fff; --ink: #1d2433; --muted: #6b7280; --accent: #5b4cf0; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: var(--bg); color: var(--ink); }
+    main { max-width: 640px; margin: 40px auto; padding: 0 16px; }
+    h1 { margin-bottom: 4px; }
+    .sub { color: var(--muted); margin-top: 0; }
+    form, .note { background: var(--card); border-radius: 10px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 12px; }
+    input, textarea { width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid #d1d5db; border-radius: 6px; font: inherit; }
+    button { background: var(--accent); color: #fff; border: 0; padding: 8px 16px; border-radius: 6px; cursor: pointer; font: inherit; }
+    .note { display: flex; justify-content: space-between; gap: 12px; }
+    .note p { margin: 4px 0 0; color: var(--muted); }
+    .del { background: #ef4444; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Dagger Notes</h1>
+    <p class="sub">Sample app built, tested and containerized by a Dagger pipeline.</p>
+    <form id="form">
+      <input id="title" placeholder="Title" required>
+      <textarea id="body" placeholder="Write something..." rows="3"></textarea>
+      <button type="submit">Add note</button>
+    </form>
+    <div id="list"></div>
+  </main>
+  <script>
+    const list = document.getElementById("list");
+
+    async function load() {
+      const notes = await (await fetch("/api/notes")).json();
+      list.innerHTML = "";
+      for (const n of notes) {
+        const el = document.createElement("div");
+        el.className = "note";
+        el.innerHTML = `<div><strong></strong><p></p></div><button class="del">Delete</button>`;
+        el.querySelector("strong").textContent = n.title;
+        el.querySelector("p").textContent = n.body;
+        el.querySelector("button").onclick = async () => {
+          await fetch(`/api/notes/${n.id}`, { method: "DELETE" });
+          load();
+        };
+        list.appendChild(el);
+      }
+    }
+
+    document.getElementById("form").onsubmit = async (e) => {
+      e.preventDefault();
+      await fetch("/api/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: title.value, body: body.value }),
+      });
+      e.target.reset();
+      load();
+    };
+
+    load();
+  </script>
+</body>
+</html>
