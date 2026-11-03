@@ -9,7 +9,7 @@ let nextId = 1;
 router.get("/", (req, res) => {
   res.json(notes);
 });
-
+// router to get requests
 router.get("/:id", (req, res) => {
   const note = notes.find((n) => n.id === Number(req.params.id));
   if (!note) return res.status(404).json({ error: "Note not found" });
